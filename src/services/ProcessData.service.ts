@@ -75,7 +75,7 @@ class ProcessDataService {
 
       keyMessageCached = `messages:${lastMessageId}`;
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 4000));
 
       const cachedMessage = await cache.recover<ICachedMessageDTO>(
         keyMessageCached
@@ -96,8 +96,7 @@ class ProcessDataService {
         },
       };
       await cache.invalidade(keyMessageCached);
-      console.log(message);
-      return null;
+      return message;
     }
     return null;
   }
