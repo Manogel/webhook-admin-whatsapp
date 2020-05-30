@@ -35,6 +35,10 @@ class RedisCacheProvider {
 
     await pipeline.exec();
   }
+
+  public async getKeys(path: string): Promise<void> {
+    await this.client.keys(path);
+  }
 }
 
 export default new RedisCacheProvider();

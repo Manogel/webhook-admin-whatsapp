@@ -1,14 +1,14 @@
 export default interface ICachedMessageDTO {
   id: string;
-  messagecreated?: boolean;
-  messageupdated?: boolean;
-  contactupdated?: boolean;
-  ticketupdated?: boolean;
-  data: {
+  fromId: string;
+  from?: {
+    name: string;
+    number: string | undefined;
+    [key: string]: any;
+  };
+  message: {
     text: string;
     isFromMe: boolean;
-    number: string | undefined;
-    name: string;
     timestamp: string;
     [key: string]: any;
   };

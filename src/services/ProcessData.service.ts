@@ -4,6 +4,7 @@ import {
 } from "./dtos/IMessageWebhookDTO";
 import ICachedMessageDTO from "../providers/cache/dtos/ICachedMessageDTO";
 import cache from "../providers/cache";
+import IContactCached from "./dtos/IContactCachedDTO";
 
 class ProcessDataService {
   async execute(data: IMessageWebhookDTO): Promise<null | ICachedMessageDTO> {
@@ -11,16 +12,14 @@ class ProcessDataService {
 
     if (data.event === EventWebhookType.MessageCreated) {
       if (data.data.isFromMe) return null;
-      const { id, isFromMe, text, timestamp } = data.data;
+      const { id, isFromMe, text, timestamp, fromId } = data.data;
       keyMessageCached = `messages:${id}`;
 
       const newMessage: ICachedMessageDTO = {
         id,
-        messagecreated: true,
-        data: {
+        fromId,
+        message: {
           isFromMe,
-          name: "Cliente",
-          number: undefined,
           text,
           timestamp,
         },
@@ -45,71 +44,81 @@ class ProcessDataService {
       //     ticketupdated: true,
       //   });
       //   return null;
-      // } else if (data.event === EventWebhookType.MessageUpdated) {
-      //   if (data.data.isFromMe) return null;
-      //   const { id } = data.data;
+    } else if (data.event === EventWebhookType.MessageUpdated) {
+      if (data.data.isFromMe) return null;
+      const { id, fromId, text, timestamp, isFromMe } = data.data;
 
-      //   keyMessageCached = `messages:${id}`;
-
-      //   const cachedMessage = await cache.recover<ICachedMessageDTO>(
-      //     keyMessageCached
-      //   );
-
-      //   if (!cachedMessage) {
-      //     console.log("Não achou a mensagem no cache");
-      //     return null;
-      //   }
-
-      //   await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      //   await cache.save(keyMessageCached, {
-      //     ...cachedMessage,
-      //     messageupdated: true,
-      //   });
-      //   return null;
-    } else if (data.event === EventWebhookType.ContactUpdated) {
-      const { lastMessageId, name, isMe } = data.data;
-      const { number } = data.data.data;
-
-      if (isMe) return null;
-
-      keyMessageCached = `messages:${lastMessageId}`;
+      keyMessageCached = `messages:${id}`;
 
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      let cachedMessage: ICachedMessageDTO | null;
+      let cachedMessage = await cache.recover<ICachedMessageDTO>(
+        keyMessageCached
+      );
+
+      if (!cachedMessage) {
+        cachedMessage = {
+          id,
+          fromId,
+          message: {
+            isFromMe,
+            text,
+            timestamp,
+          },
+        };
+      }
+
+      const keyCachedContactUser = `contacts:${fromId}`;
+
+      let cachedContactUser: IContactCached | null;
 
       var iterations = 0;
       while (true) {
-        cachedMessage = await cache.recover<ICachedMessageDTO>(
-          keyMessageCached
+        cachedContactUser = await cache.recover<IContactCached>(
+          keyCachedContactUser
         );
 
         iterations++;
-        console.log(`Tento buscar ${iterations} vez`);
-        if (cachedMessage || iterations >= 10) {
-          console.log(`Achou`);
+        if (cachedContactUser || iterations >= 20) {
           break;
         }
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
 
-      if (!cachedMessage) {
-        console.log("Não achou a mensagem no cache para salvar o contato");
+      if (!cachedContactUser) {
+        console.log("Não conseguimos localizar o contato");
         return null;
       }
 
-      const message = {
+      const message: ICachedMessageDTO = {
         ...cachedMessage,
-        contactupdated: true,
-        data: {
-          ...cachedMessage.data,
-          number,
-          name,
+        from: {
+          id: cachedContactUser.id,
+          name: cachedContactUser.name,
+          number: cachedContactUser.number,
         },
       };
+
       await cache.invalidade(keyMessageCached);
+      console.log(`processou a mensagem ${message.message.text} corretamente!`);
       return message;
+    } else if (data.event === EventWebhookType.ContactUpdated) {
+      const { name, isMe, id } = data.data;
+      const { number } = data.data.data;
+
+      if (isMe) return null;
+
+      keyMessageCached = `contacts:${id}`;
+
+      const contactUser: IContactCached = {
+        id,
+        name,
+        number,
+      };
+
+      await cache.save(keyMessageCached, contactUser);
+
+      return null;
     }
     return null;
   }
