@@ -75,11 +75,24 @@ class ProcessDataService {
 
       keyMessageCached = `messages:${lastMessageId}`;
 
-      await new Promise((resolve) => setTimeout(resolve, 4000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      const cachedMessage = await cache.recover<ICachedMessageDTO>(
-        keyMessageCached
-      );
+      let cachedMessage: ICachedMessageDTO | null;
+
+      var iterations = 0;
+      while (true) {
+        cachedMessage = await cache.recover<ICachedMessageDTO>(
+          keyMessageCached
+        );
+
+        iterations++;
+        console.log(`Tento buscar ${iterations} vez`);
+        if (cachedMessage || iterations >= 10) {
+          console.log(`Achou`);
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
 
       if (!cachedMessage) {
         console.log("Não achou a mensagem no cache para salvar o contato");
