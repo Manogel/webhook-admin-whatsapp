@@ -53,7 +53,7 @@ class ProcessDataService {
       } = data.data;
 
       keyMessageCached = `messages:${id}`;
-      console.log(data.data);
+      // console.log(data.data);
 
       let cachedMessage = await cache.recover<ICachedMessageDTO>(
         keyMessageCached
@@ -104,7 +104,7 @@ class ProcessDataService {
       }
 
       if (!cachedContactUser) {
-        console.log("Não conseguimos localizar o contato");
+        // console.log("Não conseguimos localizar o contato");
         return null;
       }
 

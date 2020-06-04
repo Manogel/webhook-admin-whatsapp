@@ -24,6 +24,9 @@ app.post("/webhook", async (request, response) => {
   // await axios.post(webhookConfig.api_mchat_url, { data });
   const message = await ProcessDataService.execute(data);
   if (message) {
+    console.log(
+      `Mensagem do tipo ${message.message.type} recebida e repassada`
+    );
     io.emit(message.serviceId, message);
   }
 
