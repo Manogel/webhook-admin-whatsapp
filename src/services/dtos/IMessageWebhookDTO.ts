@@ -1,9 +1,9 @@
 export enum EventWebhookType {
-  MessageCreated = 'message.created',
-  MessageUpdated = 'message.updated',
-  TicketUpdated = 'ticket.updated',
-  ContactUpdated = 'contact.updated',
-  ServiceUpdated = 'service.updated',
+  MessageCreated = "message.created",
+  MessageUpdated = "message.updated",
+  TicketUpdated = "ticket.updated",
+  ContactUpdated = "contact.updated",
+  ServiceUpdated = "service.updated",
 }
 
 type IActionsPayload = {
@@ -11,9 +11,14 @@ type IActionsPayload = {
     id: string;
     isFromMe: boolean;
     sent: boolean;
-    type: 'chat';
+    type: "chat" | "document" | "image";
     timestamp: string;
-    data: { ack: number; isNew: boolean; isFirst: boolean };
+    data: {
+      ack: number;
+      isNew: boolean;
+      isFirst: boolean;
+      fileDownload?: object;
+    };
     visible: boolean;
     accountId: string;
     contactId: string;
@@ -27,9 +32,14 @@ type IActionsPayload = {
     id: string;
     isFromMe: boolean;
     sent: boolean;
-    type: 'chat';
+    type: "chat" | "document" | "image";
     timestamp: string;
-    data: { ack: number; isNew: boolean; isFirst: boolean };
+    data: {
+      ack: number;
+      isNew: boolean;
+      isFirst: boolean;
+      fileDownload?: object;
+    };
     visible: boolean;
     accountId: string;
     contactId: string;
@@ -75,14 +85,14 @@ type IActionsPayload = {
   };
   [EventWebhookType.ServiceUpdated]: {
     id: string;
-    name: 'ANDROID VIRTUAL';
+    name: "ANDROID VIRTUAL";
     data: { myId: string; syncCount: number };
     settings: {
       readReceipts: boolean;
       markComposingBeforeSend: boolean;
       shouldOpenTicketForGroups: boolean;
     };
-    type: 'whatsapp';
+    type: "whatsapp";
     accountId: string;
   };
 };
