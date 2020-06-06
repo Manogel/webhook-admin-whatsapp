@@ -21,10 +21,7 @@ class ProcessDataService {
         fromId,
         serviceId,
         type,
-        data: informations,
       } = data.data;
-
-      keyMessageCached = `messages:${id}`;
 
       const newMessage: ICachedMessageDTO = {
         id,
@@ -37,53 +34,28 @@ class ProcessDataService {
           type,
         },
       };
-      await cache.save(keyMessageCached, newMessage);
-      return null;
-    } else if (data.event === EventWebhookType.MessageUpdated) {
-      if (data.data.isFromMe) return null;
-      const {
-        id,
-        fromId,
-        text,
-        type,
-        timestamp,
-        isFromMe,
-        serviceId,
-        data: informations,
-      } = data.data;
-
-      keyMessageCached = `messages:${id}`;
-      // console.log(data.data);
-
-      let cachedMessage = await cache.recover<ICachedMessageDTO>(
-        keyMessageCached
-      );
-
-      if (!cachedMessage) {
-        cachedMessage = {
-          id,
-          fromId,
-          serviceId,
-          message: {
-            type,
-            isFromMe,
-            text,
-            timestamp,
-          },
-        };
-      }
 
       if (type === "image" || type === "document") {
-        const { data: response } = await whatsapp.get(
-          `/messages/${id}?include[0]=file`
-        );
-        const { url, name, mimetype, publicFilename } = response.file;
-        cachedMessage.message.file = {
-          url,
-          name,
-          mimetype,
-          publicFilename,
-        };
+        let response = null;
+
+        while (!response) {
+          const data = await whatsapp.get(`/messages/${id}?include[0]=file`);
+          try {
+            const { url, name, mimetype, publicFilename } = data.data.file;
+            response = {
+              url,
+              name,
+              mimetype,
+              publicFilename,
+            };
+          } catch {
+            response = null;
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        newMessage.message.file = response;
       }
 
       const keyCachedContactUser = `contacts:${fromId}`;
@@ -116,32 +88,26 @@ class ProcessDataService {
         number,
       } = cachedContactUser;
 
-      const message: ICachedMessageDTO = {
-        ...cachedMessage,
-        serviceId,
-        from: {
-          id: cachedContactUser.id,
-          alternativeName,
-          isGroup,
-          isMyContact,
-          name,
-          number,
-        },
+      newMessage.from = {
+        id: cachedContactUser.id,
+        alternativeName,
+        isGroup,
+        isMyContact,
+        name,
+        number,
       };
-
-      await cache.invalidade(keyMessageCached);
 
       if (type !== "chat" && type !== "image" && type !== "document") {
         whatsapp.post("/messages", {
           number,
           serviceId,
-          text: `Não conseguimos processar a sua mensagem do tipo ${type}, evite envialas durante o atendimento!`,
+          text: `Não conseguimos processar a sua mensagem do tipo ${type}, evite envia-las durante o atendimento!`,
         });
 
         return null;
       }
 
-      return message;
+      return newMessage;
     } else if (data.event === EventWebhookType.ContactUpdated) {
       const {
         name,
