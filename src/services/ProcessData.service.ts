@@ -37,7 +37,15 @@ class ProcessDataService {
         },
       };
 
-      if (type === "image" || type === "document") {
+      // type !== "ptt"
+      // type !== "audio"
+
+      if (
+        type === "image" ||
+        type === "document" ||
+        type === "audio" ||
+        type === "ptt"
+      ) {
         let response = null;
 
         while (!response) {
@@ -100,10 +108,13 @@ class ProcessDataService {
         number,
       };
 
-      // type !== "ptt"
-      // type !== "audio"
-
-      if (type !== "chat" && type !== "image" && type !== "document") {
+      if (
+        type !== "chat" &&
+        type !== "image" &&
+        type !== "document" &&
+        type !== "audio" &&
+        type !== "ptt"
+      ) {
         whatsapp.post("/messages", {
           number,
           serviceId,
