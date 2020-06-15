@@ -11,7 +11,7 @@ type IActionsPayload = {
     id: string;
     isFromMe: boolean;
     sent: boolean;
-    type: "chat" | "document" | "image";
+    type: "chat" | "document" | "image" | "ptt" | "audio";
     timestamp: string;
     data: {
       ack: number;
@@ -23,6 +23,7 @@ type IActionsPayload = {
     accountId: string;
     contactId: string;
     fromId: string;
+    quotedMessageId?: string;
     serviceId: string;
     text: string;
     obfuscated: boolean;
@@ -85,8 +86,36 @@ type IActionsPayload = {
   };
   [EventWebhookType.ServiceUpdated]: {
     id: string;
-    name: "ANDROID VIRTUAL";
-    data: { myId: string; syncCount: number };
+    name: "Nova Conexão";
+    data: {
+      myId: string;
+      syncCount: number;
+      status: {
+        mode: "MAIN";
+        myId: "559691444688@c.us";
+        state: "NORMAL";
+        fullStore: boolean;
+        isLoading: boolean;
+        isStarted: boolean;
+        qrCodeUrl: null;
+        waVersion: string;
+        isCharging: boolean;
+        isOnQrPage: boolean;
+        isStarting: boolean;
+        isConnected: boolean;
+        batteryLevel: number;
+        isConflicted: boolean;
+        isOnChatPage: boolean;
+        isWebSyncing: boolean;
+        isPhoneAuthed: boolean;
+        needsCharging: boolean;
+        isWebConnected: boolean;
+        isQrCodeExpired: boolean;
+        qrCodeExpiresAt: number;
+        isPhoneConnected: boolean;
+        isWaitingForPhoneInternet: boolean;
+      };
+    };
     settings: {
       readReceipts: boolean;
       markComposingBeforeSend: boolean;

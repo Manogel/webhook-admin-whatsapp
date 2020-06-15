@@ -2,6 +2,7 @@ export default interface ICachedMessageDTO {
   id: string;
   fromId: string;
   serviceId: string;
+  quotedMessageId?: string;
   from?: {
     name: string;
     number: string | undefined;
@@ -11,7 +12,7 @@ export default interface ICachedMessageDTO {
     text: string;
     isFromMe: boolean;
     timestamp: string;
-    type: "chat" | "image" | "document";
+    type: "chat" | "image" | "document" | "ptt" | "audio";
     [key: string]: any;
   };
 }
