@@ -21,12 +21,14 @@ class ProcessDataService {
         fromId,
         serviceId,
         type,
+        quotedMessageId,
       } = data.data;
 
       const newMessage: ICachedMessageDTO = {
         id,
         fromId,
         serviceId,
+        quotedMessageId,
         message: {
           isFromMe,
           text,
@@ -47,6 +49,7 @@ class ProcessDataService {
               name,
               mimetype,
               publicFilename,
+              subtitle: text,
             };
           } catch {
             response = null;
@@ -96,6 +99,9 @@ class ProcessDataService {
         name,
         number,
       };
+
+      // type !== "ptt"
+      // type !== "audio"
 
       if (type !== "chat" && type !== "image" && type !== "document") {
         whatsapp.post("/messages", {
