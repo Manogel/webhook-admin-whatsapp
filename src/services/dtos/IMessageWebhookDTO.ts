@@ -3,6 +3,7 @@ export enum EventWebhookType {
   MessageUpdated = "message.updated",
   TicketUpdated = "ticket.updated",
   ContactUpdated = "contact.updated",
+  ContactCreated = "contact.created",
   ServiceUpdated = "service.updated",
 }
 
@@ -66,6 +67,25 @@ type IActionsPayload = {
     lastMessageId: string;
   };
   [EventWebhookType.ContactUpdated]: {
+    unsubscribed: boolean;
+    id: string;
+    isMe: boolean;
+    isGroup: boolean;
+    isBroadcast: boolean;
+    name: string;
+    alternativeName: string;
+    unread: number;
+    isSilenced: boolean;
+    isMyContact: boolean;
+    hadChat: boolean;
+    visible: boolean;
+    data: { number: string };
+    lastMessageAt: string;
+    lastMessageId: string;
+    accountId: string;
+    serviceId: string;
+  };
+  [EventWebhookType.ContactCreated]: {
     unsubscribed: boolean;
     id: string;
     isMe: boolean;

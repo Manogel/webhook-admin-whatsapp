@@ -125,7 +125,10 @@ class ProcessDataService {
       }
 
       return newMessage;
-    } else if (data.event === EventWebhookType.ContactUpdated) {
+    } else if (
+      data.event === EventWebhookType.ContactUpdated ||
+      data.event === EventWebhookType.ContactCreated
+    ) {
       const {
         name,
         isMe,
