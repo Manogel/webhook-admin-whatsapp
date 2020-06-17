@@ -7,34 +7,59 @@ export enum EventWebhookType {
   ServiceUpdated = "service.updated",
 }
 
-type IActionsPayload = {
-  [EventWebhookType.MessageCreated]: {
-    id: string;
-    isFromMe: boolean;
-    sent: boolean;
-    type: "chat" | "document" | "image" | "ptt" | "audio";
-    timestamp: string;
-    data: {
-      ack: number;
-      isNew: boolean;
-      isFirst: boolean;
-      fileDownload?: object;
-    };
-    visible: boolean;
-    accountId: string;
-    contactId: string;
-    fromId: string;
-    quotedMessageId?: string;
-    serviceId: string;
-    text: string;
-    obfuscated: boolean;
-    isFromBot: boolean;
+export type IArrayMessageCreated = Array<{
+  id: string;
+  isFromMe: boolean;
+  sent: boolean;
+  type: "chat" | "document" | "image" | "ptt" | "audio" | "ticket";
+  timestamp: string;
+  data: {
+    ack: number;
+    isNew: boolean;
+    isFirst: boolean;
+    fileDownload?: object;
   };
+  visible: boolean;
+  accountId: string;
+  contactId: string;
+  fromId: string;
+  quotedMessageId?: string;
+  serviceId: string;
+  text: string;
+  obfuscated: boolean;
+  isFromBot: boolean;
+}>;
+
+export type IMessageCreated = {
+  id: string;
+  isFromMe: boolean;
+  sent: boolean;
+  type: "chat" | "document" | "image" | "ptt" | "audio";
+  timestamp: string;
+  data: {
+    ack: number;
+    isNew: boolean;
+    isFirst: boolean;
+    fileDownload?: object;
+  };
+  visible: boolean;
+  accountId: string;
+  contactId: string;
+  fromId: string;
+  quotedMessageId?: string;
+  serviceId: string;
+  text: string;
+  obfuscated: boolean;
+  isFromBot: boolean;
+};
+
+type IActionsPayload = {
+  [EventWebhookType.MessageCreated]: IMessageCreated | IArrayMessageCreated;
   [EventWebhookType.MessageUpdated]: {
     id: string;
     isFromMe: boolean;
     sent: boolean;
-    type: "chat" | "document" | "image";
+    type: "chat" | "document" | "image" | "ticket";
     timestamp: string;
     data: {
       ack: number;

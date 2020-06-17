@@ -1,18 +1,43 @@
 import {
   IMessageWebhookDTO,
   EventWebhookType,
+  IArrayMessageCreated,
+  IMessageCreated,
 } from "./dtos/IMessageWebhookDTO";
 import ICachedMessageDTO from "../providers/cache/dtos/ICachedMessageDTO";
 import cache from "../providers/cache";
 import IContactCached from "./dtos/IContactCachedDTO";
 import whatsapp from "../apis/whatsapp";
+import GetFileMessageService from "./GetFileMessage.service";
 
 class ProcessDataService {
   async execute(data: IMessageWebhookDTO): Promise<null | ICachedMessageDTO> {
     let keyMessageCached = "";
 
     if (data.event === EventWebhookType.MessageCreated) {
-      if (data.data.isFromMe) return null;
+      const isArray = Array.isArray(data.data);
+
+      if (isArray) {
+        const arrayEvents = data.data as IArrayMessageCreated;
+        const findEventData = arrayEvents.find(
+          (event) => event.type === "chat"
+        );
+
+        if (!findEventData) return null;
+
+        const message = await this.execute({
+          event: data.event,
+          webhookId: data.webhookId,
+          timestamp: data.timestamp,
+          data: findEventData as IMessageCreated,
+        });
+
+        return message;
+      }
+
+      const dataEvent = data.data as IMessageCreated;
+
+      if (dataEvent.isFromMe) return null;
       const {
         id,
         isFromMe,
@@ -22,7 +47,7 @@ class ProcessDataService {
         serviceId,
         type,
         quotedMessageId,
-      } = data.data;
+      } = dataEvent;
 
       const newMessage: ICachedMessageDTO = {
         id,
@@ -37,36 +62,18 @@ class ProcessDataService {
         },
       };
 
-      // type !== "ptt"
-      // type !== "audio"
-
       if (
         type === "image" ||
         type === "document" ||
         type === "audio" ||
         type === "ptt"
       ) {
-        let response = null;
+        const response = await GetFileMessageService.execute(id);
 
-        while (!response) {
-          const data = await whatsapp.get(`/messages/${id}?include[0]=file`);
-          try {
-            const { url, name, mimetype, publicFilename } = data.data.file;
-            response = {
-              url,
-              name,
-              mimetype,
-              publicFilename,
-              subtitle: text,
-            };
-          } catch {
-            response = null;
-          }
-
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
-
-        newMessage.message.file = response;
+        newMessage.message.file = {
+          ...response,
+          subtitle: text,
+        };
       }
 
       const keyCachedContactUser = `contacts:${fromId}`;
