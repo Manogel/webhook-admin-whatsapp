@@ -65,9 +65,16 @@ class ProcessDataService {
       if (
         type === "image" ||
         type === "document" ||
+        type === "video" ||
         type === "audio" ||
         type === "ptt"
       ) {
+
+        if(type === 'video'){
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          await whatsapp.post(`/messages/${id}/sync-file`);
+        }
+
         const response = await GetFileMessageService.execute(id);
 
         newMessage.message.file = {
@@ -120,6 +127,7 @@ class ProcessDataService {
         type !== "image" &&
         type !== "document" &&
         type !== "audio" &&
+        type !== "video" &&
         type !== "ptt"
       ) {
         whatsapp.post("/messages", {

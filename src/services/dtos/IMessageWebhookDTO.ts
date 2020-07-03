@@ -34,7 +34,7 @@ export type IMessageCreated = {
   id: string;
   isFromMe: boolean;
   sent: boolean;
-  type: "chat" | "document" | "image" | "ptt" | "audio";
+  type: "chat" | "document" | "image" | "ptt" | "audio" | "video";
   timestamp: string;
   data: {
     ack: number;
@@ -59,7 +59,7 @@ type IActionsPayload = {
     id: string;
     isFromMe: boolean;
     sent: boolean;
-    type: "chat" | "document" | "image" | "ticket";
+    type: "chat" | "document" | "image" | "ticket" | "video";
     timestamp: string;
     data: {
       ack: number;

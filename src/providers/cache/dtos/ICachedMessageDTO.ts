@@ -12,7 +12,7 @@ export default interface ICachedMessageDTO {
     text: string;
     isFromMe: boolean;
     timestamp: string;
-    type: "chat" | "image" | "document" | "ptt" | "audio";
+    type: "chat" | "image" | "document" | "ptt" | "audio" | "video";
     [key: string]: any;
   };
 }
