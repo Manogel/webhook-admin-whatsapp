@@ -71,7 +71,6 @@ class ProcessDataService {
       ) {
 
         if(type === 'video'){
-          await new Promise(resolve => setTimeout(resolve, 2000))
           await whatsapp.post(`/messages/${id}/sync-file`);
         }
 

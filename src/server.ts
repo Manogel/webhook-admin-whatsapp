@@ -22,10 +22,9 @@ io.on("connection", (socket) => {
 app.post("/webhook", async (request, response) => {
   const data = request.body;
   // console.log(data);
-  // await axios.post(webhookConfig.api_mchat_url, { data });
   const message = await ProcessDataService.execute(data);
   if (message) {
-    // console.log(`Mensagem recebida e repassada`);
+    // console.log(message);
     io.emit(message.serviceId, message);
   }
 
