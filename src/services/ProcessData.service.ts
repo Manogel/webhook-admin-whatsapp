@@ -47,6 +47,7 @@ class ProcessDataService {
         serviceId,
         type,
         quotedMessageId,
+        contactId
       } = dataEvent;
 
       const newMessage: ICachedMessageDTO = {
@@ -82,7 +83,7 @@ class ProcessDataService {
         };
       }
 
-      const keyCachedContactUser = `contacts:${fromId}`;
+      const keyCachedContactUser = `contacts:${contactId}`;
 
       let cachedContactUser: IContactCached | null;
 
@@ -110,6 +111,7 @@ class ProcessDataService {
         isMyContact,
         name,
         number,
+        
       } = cachedContactUser;
 
       newMessage.from = {
@@ -150,10 +152,11 @@ class ProcessDataService {
         isMyContact,
         isGroup,
         alternativeName,
+        
       } = data.data;
       const { number } = data.data.data;
 
-      if (isMe) return null;
+      if (isMe || isGroup) return null;
 
       keyMessageCached = `contacts:${id}`;
 
