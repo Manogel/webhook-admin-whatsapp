@@ -17,6 +17,14 @@ class ProcessDataService {
     if (data.event === EventWebhookType.MessageCreated) {
       const isArray = Array.isArray(data.data);
 
+      const dateOfMessage = new Date(data.timestamp).getDate();
+      const dateNow = new Date().getDate();
+
+      if (dateOfMessage < dateNow - 1) {
+        console.log("Data não corresponde ao dia atual", data.timestamp);
+        return null;
+      }
+
       if (isArray) {
         const arrayEvents = data.data as IArrayMessageCreated;
         const findEventData = arrayEvents.find(
@@ -70,8 +78,7 @@ class ProcessDataService {
         type === "audio" ||
         type === "ptt"
       ) {
-
-        if(type === 'video'){
+        if (type === "video") {
           await whatsapp.post(`/messages/${id}/sync-file`);
         }
 
