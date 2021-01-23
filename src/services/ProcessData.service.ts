@@ -3,16 +3,16 @@ import {
   EventWebhookType,
   IArrayMessageCreated,
   IMessageCreated,
-} from "./dtos/IMessageWebhookDTO";
-import ICachedMessageDTO from "../providers/cache/dtos/ICachedMessageDTO";
-import cache from "../providers/cache";
-import IContactCached from "./dtos/IContactCachedDTO";
-import whatsapp from "../apis/whatsapp";
-import GetFileMessageService from "./GetFileMessage.service";
+} from './dtos/IMessageWebhookDTO';
+import ICachedMessageDTO from '../providers/cache/dtos/ICachedMessageDTO';
+import cache from '../providers/cache';
+import IContactCached from './dtos/IContactCachedDTO';
+import whatsapp from '../apis/whatsapp';
+import GetFileMessageService from './GetFileMessage.service';
 
 class ProcessDataService {
   async execute(data: IMessageWebhookDTO): Promise<null | ICachedMessageDTO> {
-    let keyMessageCached = "";
+    let keyMessageCached = '';
 
     if (data.event === EventWebhookType.MessageCreated) {
       const isArray = Array.isArray(data.data);
@@ -21,14 +21,14 @@ class ProcessDataService {
       const dateNow = new Date().getDate();
 
       if (dateOfMessage < dateNow - 1) {
-        console.log("Data não corresponde ao dia atual", data.timestamp);
+        console.log('Data não corresponde ao dia atual', data.timestamp);
         return null;
       }
 
       if (isArray) {
         const arrayEvents = data.data as IArrayMessageCreated;
         const findEventData = arrayEvents.find(
-          (event) => event.type === "chat"
+          (event) => event.type === 'chat'
         );
 
         if (!findEventData) return null;
@@ -55,7 +55,7 @@ class ProcessDataService {
         serviceId,
         type,
         quotedMessageId,
-        contactId
+        contactId,
       } = dataEvent;
 
       const newMessage: ICachedMessageDTO = {
@@ -72,13 +72,13 @@ class ProcessDataService {
       };
 
       if (
-        type === "image" ||
-        type === "document" ||
-        type === "video" ||
-        type === "audio" ||
-        type === "ptt"
+        type === 'image' ||
+        type === 'document' ||
+        type === 'video' ||
+        type === 'audio' ||
+        type === 'ptt'
       ) {
-        if (type === "video") {
+        if (type === 'video') {
           await whatsapp.post(`/messages/${id}/sync-file`);
         }
 
@@ -118,7 +118,6 @@ class ProcessDataService {
         isMyContact,
         name,
         number,
-        
       } = cachedContactUser;
 
       newMessage.from = {
@@ -131,14 +130,14 @@ class ProcessDataService {
       };
 
       if (
-        type !== "chat" &&
-        type !== "image" &&
-        type !== "document" &&
-        type !== "audio" &&
-        type !== "video" &&
-        type !== "ptt"
+        type !== 'chat' &&
+        type !== 'image' &&
+        type !== 'document' &&
+        type !== 'audio' &&
+        type !== 'video' &&
+        type !== 'ptt'
       ) {
-        whatsapp.post("/messages", {
+        whatsapp.post('/messages', {
           number,
           serviceId,
           text: `Não conseguimos processar a sua mensagem do tipo ${type}, evite envia-las durante o atendimento!`,
@@ -159,7 +158,6 @@ class ProcessDataService {
         isMyContact,
         isGroup,
         alternativeName,
-        
       } = data.data;
       const { number } = data.data.data;
 
@@ -170,7 +168,7 @@ class ProcessDataService {
       const contactUser: IContactCached = {
         id,
         name,
-        number,
+        number: number || alternativeName.replace(/[^\d]+/g, ''),
         isMyContact,
         isGroup,
         alternativeName,
